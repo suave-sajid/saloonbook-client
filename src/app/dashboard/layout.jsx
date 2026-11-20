@@ -19,20 +19,22 @@ import { Button } from "@/components/ui/button";
 const adminLinks = [
   { label: "Overview", href: "/dashboard/admin", icon: ChartNoAxesColumnIncreasing },
   { label: "Services", href: "/dashboard/admin/services", icon: Scissors },
+  { label: "Manage services", href: "/dashboard/admin/services/manage", icon: Scissors },
   { label: "Appointments", href: "/dashboard/admin/appointments", icon: CalendarDays },
   { label: "Customers", href: "/dashboard/admin/users", icon: UsersRound },
   { label: "Transactions", href: "/dashboard/admin/transactions", icon: CircleDollarSign },
-  { label: "My profile", href: "/profile", icon: UserRound },
 ];
 
 const customerLinks = [
   { label: "Overview", href: "/dashboard/customer", icon: ChartNoAxesColumnIncreasing },
   { label: "My appointments", href: "/dashboard/customer/appointments", icon: CalendarDays },
-  { label: "My profile", href: "/profile", icon: UserRound },
 ];
 
 function isActiveLink(pathname, href) {
   if (href === "/dashboard/admin" || href === "/dashboard/customer") {
+    return pathname === href;
+  }
+  if (href === "/dashboard/admin/services") {
     return pathname === href;
   }
   return pathname === href || pathname.startsWith(`${href}/`);

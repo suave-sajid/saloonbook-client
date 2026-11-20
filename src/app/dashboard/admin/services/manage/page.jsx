@@ -1,0 +1,240 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { ArrowLeft, Pencil, Plus, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { apiRequest } from "@/lib/server-api";
+
+const emptyForm = {
+  serviceName: "",
+  category: "",
+  description: "",
+  price: "",
+  duration: "",
+  image: "",
+  status: "active",
+};
+
+const fields = [
+  ["serviceName", "Service name", "text"],
+  ["category", "Category", "text"],
+  ["price", "Price (৳)", "number"],
+  ["duration", "Duration (minutes)", "number"],
+  ["image", "Image URL", "url"],
+];
+
+export default function ManageServices() {
+  const [services, setServices] = useState([]);
+  const [form, setForm] = useState(emptyForm);
+  const [editing, setEditing] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const result = await apiRequest("/api/admin/services");
+      setServices(result.data || []);
+    } catch (error) {
+      toast.error(error.message || "Couldn’t load services.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    apiRequest("/api/admin/services")
+      .then((result) => setServices(result.data || []))
+      .catch((error) => toast.error(error.message || "Couldn’t load services."))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const resetForm = () => {
+    setForm(emptyForm);
+    setEditing(null);
+  };
+
+  const save = async (event) => {
+    event.preventDefault();
+    setSaving(true);
+    try {
+      await apiRequest(
+        editing ? `/api/admin/services/${editing}` : "/api/admin/services",
+        {
+          method: editing ? "PATCH" : "POST",
+          body: JSON.stringify({
+            ...form,
+            price: Number(form.price),
+            duration: Number(form.duration),
+          }),
+        },
+      );
+      toast.success(editing ? "Service updated" : "Service created");
+      resetForm();
+      await load();
+    } catch (error) {
+      toast.error(error.message || "Couldn’t save service.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const edit = (service) => {
+    setEditing(service._id);
+    setForm({
+      serviceName: service.serviceName || "",
+      category: service.category || "",
+      description: service.description || "",
+      price: service.price ?? "",
+      duration: service.duration ?? "",
+      image: service.image || "",
+      status: service.status || "active",
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const toggleStatus = async (service) => {
+    const nextStatus = service.status === "active" ? "inactive" : "active";
+    try {
+      await apiRequest(`/api/admin/services/${service._id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: nextStatus }),
+      });
+      toast.success(`Service ${nextStatus === "active" ? "activated" : "deactivated"}`);
+      await load();
+    } catch (error) {
+      toast.error(error.message || "Couldn’t update service status.");
+    }
+  };
+
+  const remove = async (service) => {
+    if (!window.confirm(`Delete “${service.serviceName}”? This cannot be undone.`)) return;
+    try {
+      await apiRequest(`/api/admin/services/${service._id}`, { method: "DELETE" });
+      toast.success("Service deleted");
+      if (editing === service._id) resetForm();
+      await load();
+    } catch (error) {
+      toast.error(error.message || "Couldn’t delete service.");
+    }
+  };
+
+  return (
+    <div>
+      <Link
+        className="mb-5 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        href="/dashboard/admin/services"
+      >
+        <ArrowLeft aria-hidden="true" className="size-4" />
+        Back to services
+      </Link>
+
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Manage services</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Add, edit, activate, or remove services from the salon catalog.
+        </p>
+      </div>
+
+      <form onSubmit={save} className="mt-6 rounded-xl border bg-card p-5 shadow-sm sm:p-6">
+        <div className="mb-5 flex items-center gap-2">
+          {editing ? <Pencil aria-hidden="true" className="size-4 text-muted-foreground" /> : <Plus aria-hidden="true" className="size-4 text-muted-foreground" />}
+          <h2 className="font-semibold">{editing ? "Edit service" : "Add a service"}</h2>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {fields.map(([key, label, type]) => (
+            <label className="text-sm font-medium" key={key}>
+              {label}
+              <input
+                className="mt-2 h-10 w-full rounded-md border bg-background px-3 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
+                min={type === "number" ? "0.01" : undefined}
+                onChange={(event) => setForm({ ...form, [key]: event.target.value })}
+                required={key !== "image"}
+                step={type === "number" ? "any" : undefined}
+                type={type}
+                value={form[key]}
+              />
+            </label>
+          ))}
+          <label className="text-sm font-medium">
+            Status
+            <select
+              className="mt-2 h-10 w-full rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              onChange={(event) => setForm({ ...form, status: event.target.value })}
+              value={form.status}
+            >
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </label>
+          <label className="text-sm font-medium sm:col-span-2">
+            Description
+            <textarea
+              className="mt-2 min-h-24 w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              onChange={(event) => setForm({ ...form, description: event.target.value })}
+              required
+              value={form.description}
+            />
+          </label>
+        </div>
+        <div className="mt-5 flex flex-wrap gap-2">
+          <Button disabled={saving} type="submit">
+            {saving ? "Saving..." : editing ? "Save changes" : "Create service"}
+          </Button>
+          {editing && (
+            <Button onClick={resetForm} type="button" variant="outline">
+              Cancel editing
+            </Button>
+          )}
+        </div>
+      </form>
+
+      <section className="mt-6 overflow-hidden rounded-xl border bg-card shadow-sm">
+        <div className="border-b px-5 py-4">
+          <h2 className="font-semibold">Existing services</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{services.length} service{services.length === 1 ? "" : "s"}</p>
+        </div>
+        {loading ? (
+          <p aria-live="polite" className="p-8 text-center text-sm text-muted-foreground">Loading services...</p>
+        ) : services.length === 0 ? (
+          <p className="p-8 text-center text-sm text-muted-foreground">No services to manage yet.</p>
+        ) : (
+          <div className="divide-y">
+            {services.map((service) => (
+              <article className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between" key={service._id}>
+                <div className="min-w-0">
+                  <h3 className="truncate font-medium">{service.serviceName}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {service.category} · ৳{service.price} · {service.duration} min
+                  </p>
+                  <span className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${
+                    service.status === "active"
+                      ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                      : "bg-muted text-muted-foreground"
+                  }`}>
+                    {service.status === "active" ? "Active" : "Inactive"}
+                  </span>
+                </div>
+                <div className="flex shrink-0 flex-wrap gap-2">
+                  <Button onClick={() => toggleStatus(service)} size="sm" variant="outline">
+                    {service.status === "active" ? "Deactivate" : "Activate"}
+                  </Button>
+                  <Button onClick={() => edit(service)} size="sm" variant="outline">
+                    <Pencil aria-hidden="true" />
+                    Edit
+                  </Button>
+                  <Button onClick={() => remove(service)} size="sm" variant="destructive">
+                    <Trash2 aria-hidden="true" />
+                    Delete
+                  </Button>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
