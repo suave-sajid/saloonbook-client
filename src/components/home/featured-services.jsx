@@ -12,7 +12,7 @@ function ServiceCardSkeleton() {
   return (
     <div
       aria-hidden="true"
-      className="overflow-hidden rounded-2xl border border-[#e9e2d7] bg-[#fffefa]"
+      className="overflow-hidden rounded-2xl border border-[#e9e2d7] bg-[#fffefa] dark:border-stone-800 dark:bg-stone-900"
     >
       <div className="aspect-[1.55/1] animate-pulse bg-[#e9e2d7]" />
       <div className="space-y-4 p-5 sm:p-6">
@@ -72,28 +72,28 @@ export default function FeaturedServices() {
   return (
     <section
       aria-labelledby="featured-services-title"
-      className="bg-[#f3f0e9] px-5 py-20 sm:px-8 sm:py-24 lg:px-12 lg:py-28"
+      className="bg-[#f3f0e9] px-5 py-20 dark:bg-stone-900 sm:px-8 sm:py-24 lg:px-12 lg:py-28"
     >
       <div className="mx-auto max-w-7xl">
         <div className="mb-10 flex flex-col gap-6 sm:mb-12 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-2xl">
-            <p className="mb-4 inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] text-[#927758] sm:text-xs">
+            <p className="mb-4 inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] text-[#927758] dark:text-amber-200 sm:text-xs">
               <Sparkles aria-hidden="true" className="size-4" />
               A LITTLE SOMETHING FOR YOU
             </p>
             <h2
-              className="font-serif text-3xl leading-tight font-medium tracking-tight text-[#342c24] sm:text-4xl lg:text-[42px]"
+              className="font-serif text-3xl leading-tight font-medium tracking-tight text-[#342c24] dark:text-stone-100 sm:text-4xl lg:text-[42px]"
               id="featured-services-title"
             >
               Discover Our Featured Services
             </h2>
-            <p className="mt-4 max-w-xl text-sm leading-6 text-[#81766a] sm:text-base sm:leading-7">
+            <p className="mt-4 max-w-xl text-sm leading-6 text-[#81766a] dark:text-stone-400 sm:text-base sm:leading-7">
               Explore exceptional treatments and professional care designed
               to make you feel your best.
             </p>
           </div>
           <Link
-            className="group inline-flex w-fit items-center gap-2 text-sm font-semibold text-[#365a48] transition-colors hover:text-[#203d30]"
+            className="group inline-flex w-fit items-center gap-2 text-sm font-semibold text-[#365a48] transition-colors hover:text-[#203d30] dark:text-emerald-300 dark:hover:text-emerald-200"
             href="/services"
           >
             View All Services
@@ -128,14 +128,14 @@ export default function FeaturedServices() {
         )}
 
         {status === "empty" && (
-          <div className="rounded-2xl border border-dashed border-[#d9cdbd] bg-[#fffefa]/75 px-6 py-14 text-center sm:py-16">
+          <div className="rounded-2xl border border-dashed border-[#d9cdbd] bg-[#fffefa]/75 px-6 py-14 text-center dark:border-stone-700 dark:bg-stone-950 sm:py-16">
             <span className="mx-auto flex size-12 items-center justify-center rounded-full bg-[#eee8de] text-[#8b7458]">
               <Sparkles aria-hidden="true" className="size-5" />
             </span>
-            <h3 className="mt-5 font-serif text-2xl font-medium text-[#342c24]">
+            <h3 className="mt-5 font-serif text-2xl font-medium text-[#342c24] dark:text-stone-100">
               No services available just yet.
             </h3>
-            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-[#81766a]">
+            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-[#81766a] dark:text-stone-400">
               New salon services will be available here soon. Please check back
               later.
             </p>
@@ -144,16 +144,16 @@ export default function FeaturedServices() {
 
         {status === "error" && (
           <div
-            className="rounded-2xl border border-[#e5d7c8] bg-[#fffefa]/80 px-6 py-12 text-center"
+            className="rounded-2xl border border-[#e5d7c8] bg-[#fffefa]/80 px-6 py-12 text-center dark:border-stone-700 dark:bg-stone-950"
             role="alert"
           >
             <span className="mx-auto flex size-12 items-center justify-center rounded-full bg-[#f3e8dc] text-[#9b7459]">
               <CircleAlert aria-hidden="true" className="size-5" />
             </span>
-            <h3 className="mt-5 font-serif text-2xl font-medium text-[#342c24]">
+            <h3 className="mt-5 font-serif text-2xl font-medium text-[#342c24] dark:text-stone-100">
               We couldn&apos;t load our services.
             </h3>
-            <p className="mt-3 text-sm text-[#81766a]">
+            <p className="mt-3 text-sm text-[#81766a] dark:text-stone-400">
               Please try again in a moment.
             </p>
             <Button

@@ -1,77 +1,33 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-
-const categories = [
-  {
-    name: "Haircut & Styling",
-    image:
-      "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=900&q=85",
-    alt: "Hair stylist shaping a client's hairstyle in a salon",
-  },
-  {
-    name: "Hair Coloring",
-    image:
-      "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=900&q=85",
-    alt: "Hair color treatment being applied by a stylist",
-  },
-  {
-    name: "Hair Treatment",
-    image:
-      "https://images.unsplash.com/photo-1600948836101-f9ffda59d250?auto=format&fit=crop&w=900&q=85",
-    alt: "Client receiving a restorative hair treatment",
-  },
-  {
-    name: "Facial & Skincare",
-    image:
-      "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=900&q=85",
-    alt: "Relaxing facial skincare treatment",
-  },
-  {
-    name: "Makeup",
-    image:
-      "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=900&q=85",
-    alt: "Makeup artist applying a polished beauty look",
-  },
-  {
-    name: "Manicure & Pedicure",
-    image:
-      "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?auto=format&fit=crop&w=900&q=85",
-    alt: "Careful manicure service with a fresh nail finish",
-  },
-  {
-    name: "Spa & Massage",
-    image:
-      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=900&q=85",
-    alt: "Peaceful spa treatment room prepared for relaxation",
-  },
-];
+import { SERVICE_CATEGORIES } from "@/lib/service-categories";
 
 export default function ServiceCategories() {
   return (
     <section
       aria-labelledby="service-categories-title"
-      className="bg-[#faf8f4] px-5 py-20 sm:px-8 sm:py-24 lg:px-12 lg:py-28"
+      className="bg-[#faf8f4] px-5 py-20 dark:bg-stone-950 sm:px-8 sm:py-24 lg:px-12 lg:py-28"
     >
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto mb-10 max-w-2xl text-center sm:mb-12">
-          <p className="mb-4 text-[11px] font-semibold tracking-[0.2em] text-[#927758] sm:text-xs">
+          <p className="mb-4 text-[11px] font-semibold tracking-[0.2em] text-[#927758] dark:text-amber-200 sm:text-xs">
             FIND YOUR KIND OF CARE
           </p>
           <h2
-            className="font-serif text-3xl leading-tight font-medium tracking-tight text-[#342c24] sm:text-4xl lg:text-[42px]"
+            className="font-serif text-3xl leading-tight font-medium tracking-tight text-[#342c24] dark:text-stone-100 sm:text-4xl lg:text-[42px]"
             id="service-categories-title"
           >
             Explore Our Services
           </h2>
-          <p className="mt-4 text-sm leading-6 text-[#81766a] sm:text-base sm:leading-7">
+          <p className="mt-4 text-sm leading-6 text-[#81766a] dark:text-stone-400 sm:text-base sm:leading-7">
             From everyday essentials to indulgent treatments, discover the
             right care for every moment.
           </p>
         </div>
 
         <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4 lg:gap-6">
-          {categories.map((category) => (
+          {SERVICE_CATEGORIES.map((category) => (
             <Link
               aria-label={`Explore ${category.name} services`}
               className="group relative isolate aspect-[0.82/1] overflow-hidden rounded-2xl bg-[#e8dfd3] shadow-[0_12px_35px_-28px_rgba(57,43,29,0.5)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_45px_-28px_rgba(57,43,29,0.42)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#66806e] sm:aspect-[0.92/1] lg:aspect-[0.82/1]"
@@ -84,7 +40,6 @@ export default function ServiceCategories() {
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 src={category.image}
-                unoptimized
               />
               <span
                 aria-hidden="true"

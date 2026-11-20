@@ -5,3 +5,7 @@ export function getServicesEndpoint() {
   const baseUrl = API_URL.replace(/\/+$/, "");
   return `${baseUrl.endsWith("/api") ? baseUrl : `${baseUrl}/api`}/services`;
 }
+
+export function getServiceEndpoint(id) {
+  return `${getServicesEndpoint()}/${encodeURIComponent(id)}`;
+}

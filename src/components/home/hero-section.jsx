@@ -4,19 +4,19 @@ import { Button } from "@/components/ui/button";
 
 export default function HeroSection() {
   return (
-    <section className="overflow-hidden bg-[#faf8f4]">
+    <section className="overflow-hidden bg-[#faf8f4] dark:bg-stone-950">
       <div className="mx-auto grid min-h-[calc(100svh-76px)] max-w-7xl items-center gap-12 px-5 py-14 sm:px-8 sm:py-16 lg:grid-cols-[0.92fr_1.08fr] lg:gap-16 lg:px-12 lg:py-20">
         <div className="hero-enter relative z-10 max-w-xl lg:py-8">
-          <p className="mb-6 inline-flex items-center gap-3 text-[11px] font-semibold tracking-[0.22em] text-[#66806e] sm:text-xs">
+          <p className="mb-6 inline-flex items-center gap-3 text-[11px] font-semibold tracking-[0.22em] text-[#66806e] dark:text-emerald-300 sm:text-xs">
             <span className="h-px w-8 bg-[#a5b1a3]" />
             YOUR BEAUTY, YOUR MOMENT
           </p>
-          <h1 className="max-w-[620px] font-serif text-[clamp(3.35rem,7vw,5.75rem)] leading-[0.98] font-medium tracking-[-0.055em] text-[#263d32]">
+          <h1 className="max-w-[620px] font-serif text-[clamp(3.35rem,7vw,5.75rem)] leading-[0.98] font-medium tracking-[-0.055em] text-[#263d32] dark:text-stone-100">
             Beauty begins
             <br />
-            <span className="text-[#9b7459]">with you.</span>
+            <span className="text-[#9b7459] dark:text-amber-200">with you.</span>
           </h1>
-          <p className="mt-7 max-w-lg text-base leading-7 text-stone-600 sm:text-lg sm:leading-8">
+          <p className="mt-7 max-w-lg text-base leading-7 text-stone-600 dark:text-stone-300 sm:text-lg sm:leading-8">
             Discover exceptional salon services, explore trusted treatments,
             and book your next moment of self-care.
           </p>
@@ -29,19 +29,19 @@ export default function HeroSection() {
               <span aria-hidden="true" className="ml-1 text-lg">→</span>
             </Button>
             <Button
-              className="h-12 rounded-full px-7 text-sm font-semibold text-[#344d40] transition duration-300 hover:-translate-y-0.5 hover:bg-[#eeece5]"
+              className="h-12 rounded-full px-7 text-sm font-semibold text-[#344d40] transition duration-300 hover:-translate-y-0.5 hover:bg-[#eeece5] dark:text-emerald-100 dark:hover:bg-stone-800"
               render={<Link href="/about" />}
               variant="ghost"
             >
               Discover More
             </Button>
           </div>
-          <div className="mt-12 flex items-center gap-3 text-xs font-medium text-stone-500 sm:mt-16">
+          <div className="mt-12 flex items-center gap-3 text-xs font-medium text-stone-500 dark:text-stone-400 sm:mt-16">
             <span className="flex -space-x-2">
               {["A", "M", "S"].map((initial, index) => (
                 <span
                   aria-hidden="true"
-                  className={`flex size-8 items-center justify-center rounded-full border-2 border-[#faf8f4] text-[10px] font-semibold text-white ${
+                  className={`flex size-8 items-center justify-center rounded-full border-2 border-[#faf8f4] text-[10px] font-semibold text-white dark:border-stone-950 ${
                     index === 0
                       ? "bg-[#9b7459]"
                       : index === 1
@@ -72,13 +72,13 @@ export default function HeroSection() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#1a261f]/25 via-transparent to-white/5" />
           </div>
-          <div className="absolute -bottom-5 left-4 z-20 rounded-2xl border border-white/60 bg-white/90 px-4 py-3 shadow-[0_18px_40px_-24px_rgba(42,36,29,0.5)] backdrop-blur sm:bottom-7 sm:-left-10 sm:px-5 sm:py-4">
-            <p className="font-serif text-lg leading-tight text-[#29483c] sm:text-xl">
+          <div className="absolute -bottom-5 left-4 z-20 rounded-2xl border border-white/60 bg-white/90 px-4 py-3 shadow-[0_18px_40px_-24px_rgba(42,36,29,0.5)] backdrop-blur dark:border-stone-700 dark:bg-stone-900/95 sm:bottom-7 sm:-left-10 sm:px-5 sm:py-4">
+            <p className="font-serif text-lg leading-tight text-[#29483c] dark:text-emerald-100 sm:text-xl">
               A little time,
               <br />
               just for you.
             </p>
-            <p className="mt-1.5 text-[10px] font-medium tracking-[0.14em] text-stone-500 uppercase">
+            <p className="mt-1.5 text-[10px] font-medium tracking-[0.14em] text-stone-500 dark:text-stone-400 uppercase">
               Your self-care starts here
             </p>
           </div>
