@@ -8,11 +8,7 @@ export const metadata = {
 
 export default function SignUpPage() {
   return (
-    <AuthLayout
-      description="Discover exceptional salon services and book your next appointment with ease."
-      image="https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1400&q=85"
-      title="Your beauty journey starts here."
-    >
+    <AuthLayout activeTab="sign-up">
       <SignUpForm />
     </AuthLayout>
   );

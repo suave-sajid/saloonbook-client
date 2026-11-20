@@ -1,33 +1,84 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { AuthField, GoogleButton, OrDivider, ProfileImageField } from "./auth-form-controls";
+import { AuthField, ProfileImageField } from "./auth-form-controls";
 import PasswordField from "./password-field";
-import { ArrowRight, Mail, User } from "lucide-react";
-import Link from "next/link";
+import { Mail, User } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function SignUpForm() {
+  const router = useRouter();
+  const [submitState, setSubmitState] = useState("idle");
+  const [profileImage, setProfileImage] = useState({
+    status: "idle",
+    url: "",
+  });
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (profileImage.status === "uploading") {
+      toast.error("Please wait for your profile photo to finish uploading.");
+      return;
+    }
+    if (profileImage.status === "error") {
+      toast.error("Remove the failed upload or choose another profile photo.");
+      return;
+    }
+
+    const formData = new FormData(event.currentTarget);
+    const name = String(formData.get("full-name") ?? "").trim();
+    const email = String(formData.get("email") ?? "").trim();
+    const password = String(formData.get("password") ?? "");
+    const profileImageUrl = String(
+      formData.get("profile-image-url") ?? "",
+    ).trim();
+
+    try {
+      setSubmitState("creating");
+      const image = profileImage.url || profileImageUrl
+        || new URL("/avatar-default.svg", window.location.origin).toString();
+
+      const { error } = await authClient.signUp.email({
+        name,
+        email,
+        password,
+        image,
+      });
+
+      if (error) {
+        toast.error(error.message || "We couldn't create your account.");
+        return;
+      }
+
+      toast.success("Account created successfully", {
+        description: "You can now sign in to SalonBook.",
+      });
+      router.push("/sign-in");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "We couldn't create your account. Please try again.",
+      );
+    } finally {
+      setSubmitState("idle");
+    }
+  };
+
   return (
     <div className="auth-content--signup">
-      <div className="auth-heading mb-4">
-        <p className="mb-3 text-xs font-semibold tracking-[0.2em] text-rose-700 dark:text-rose-300">
-          A BETTER WAY TO BOOK
-        </p>
-        <h2 className="font-serif text-3xl font-medium tracking-tight text-stone-950 dark:text-stone-100 sm:text-[2.1rem]">
-          Create your account
-        </h2>
-        <p className="mt-2 text-sm leading-6 text-stone-500 dark:text-stone-400">
-          Join SalonBook and make every appointment effortless.
-        </p>
-      </div>
-
-      <form className="space-y-3" onSubmit={(event) => event.preventDefault()}>
+      <form className="auth-form-fields space-y-4" onSubmit={handleSubmit}>
         <AuthField
           autoComplete="name"
           icon={User}
           label="Full Name"
           name="full-name"
           placeholder="Enter your full name"
+          required
         />
         <AuthField
           autoComplete="email"
@@ -35,38 +86,30 @@ export default function SignUpForm() {
           label="Email Address"
           name="email"
           placeholder="you@example.com"
+          required
           type="email"
         />
         <PasswordField
-          helper
           label="Password"
           name="password"
           placeholder="Create a password"
+          required
         />
-        <ProfileImageField />
+        <ProfileImageField
+          onUploadChange={(status, url) => setProfileImage({ status, url })}
+        />
         <Button
-          className="h-12 w-full rounded-xl bg-rose-800 text-sm font-semibold text-white shadow-[0_8px_18px_-8px_rgba(136,54,65,0.55)] transition hover:bg-rose-900 dark:bg-rose-700 dark:hover:bg-rose-600"
+          className="auth-primary-button h-11 w-full rounded-lg bg-emerald-400 text-sm font-semibold text-[#07120f] shadow-[0_8px_22px_-9px_rgba(16,212,138,0.7)] transition hover:bg-emerald-300"
           type="submit"
+          disabled={submitState !== "idle"}
         >
-          Create Account
-          <ArrowRight aria-hidden="true" className="ml-1 size-4" />
+          {submitState === "uploading"
+            ? "Uploading profile photo..."
+            : submitState === "creating"
+              ? "Creating account..."
+              : "Create Account"}
         </Button>
       </form>
-
-      <div className="auth-divider my-4">
-        <OrDivider />
-      </div>
-      <GoogleButton />
-
-      <p className="auth-account-link mt-4 text-center text-sm text-stone-500 dark:text-stone-400">
-        Already have an account?{" "}
-        <Link
-          className="font-semibold text-rose-800 transition hover:text-rose-950 dark:text-rose-300 dark:hover:text-rose-200"
-          href="/sign-in"
-        >
-          Sign in
-        </Link>
-      </p>
     </div>
   );
 }
