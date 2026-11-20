@@ -1,6 +1,13 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Clock3, Scissors, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
+import { apiRequest } from "@/lib/server-api";
+import { toast } from "sonner";
 
 function getImage(service) {
   const image = service.imageUrl || service.serviceImage || service.image;
@@ -25,6 +32,49 @@ function getPrice(price) {
 
 export default function ServiceDetail({ service }) {
   const image = getImage(service);
+  const router = useRouter();
+  const { data: session, isPending } = authClient.useSession();
+  const [date, setDate] = useState("");
+  const [timeSlot, setTimeSlot] = useState("09:00 AM");
+  const [message, setMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const slots = ["09:00 AM", "10:30 AM", "12:00 PM", "02:00 PM", "03:30 PM", "05:00 PM", "06:30 PM"];
+
+  useEffect(() => {
+    if (!isPending && !session?.user) {
+      router.replace(`/sign-in?callbackUrl=/services/${service._id || service.id}`);
+    }
+  }, [isPending, session, router, service]);
+
+  const submit = async (event) => {
+    event.preventDefault();
+    if (!session?.user) {
+      router.push(`/sign-in?callbackUrl=/services/${service._id || service.id}`);
+      return;
+    }
+    if (session.user.role === "admin") {
+      toast.error("Administrator accounts cannot create customer appointments.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await apiRequest("/api/appointments", {
+        method: "POST",
+        body: JSON.stringify({
+          serviceId: service._id || service.id,
+          appointmentDate: date,
+          timeSlot,
+          message,
+        }),
+      });
+      toast.success("Appointment request submitted.");
+      router.push("/dashboard/customer/appointments");
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-[#faf8f4] px-5 py-12 dark:bg-stone-950 sm:px-8 sm:py-16 lg:px-12">
@@ -88,6 +138,21 @@ export default function ServiceDetail({ service }) {
                 </p>
               </div>
             </div>
+            {session?.user?.role !== "admin" && (
+              <form onSubmit={submit} className="mt-6 grid gap-3 rounded-2xl bg-[#f3f0e9] p-4 dark:bg-stone-800">
+                <h2 className="font-serif text-xl text-[#342c24] dark:text-stone-100">Request an appointment</h2>
+                <label className="text-xs font-semibold text-stone-600 dark:text-stone-300">Date
+                  <input type="date" required min={new Date().toISOString().slice(0, 10)} value={date} onChange={(e) => setDate(e.target.value)} className="mt-2 h-11 w-full rounded-lg border border-stone-300 px-3 dark:border-stone-700 dark:bg-stone-950" />
+                </label>
+                <label className="text-xs font-semibold text-stone-600 dark:text-stone-300">Time slot
+                  <select value={timeSlot} onChange={(e) => setTimeSlot(e.target.value)} className="mt-2 h-11 w-full rounded-lg border border-stone-300 px-3 dark:border-stone-700 dark:bg-stone-950">{slots.map((slot) => <option key={slot}>{slot}</option>)}</select>
+                </label>
+                <label className="text-xs font-semibold text-stone-600 dark:text-stone-300">Message (optional)
+                  <textarea value={message} onChange={(e) => setMessage(e.target.value)} className="mt-2 min-h-20 w-full rounded-lg border border-stone-300 px-3 py-2 dark:border-stone-700 dark:bg-stone-950" />
+                </label>
+                <button disabled={submitting} className="h-11 rounded-full bg-[#1f493c] text-sm font-semibold text-white">{submitting ? "Submitting..." : "Request appointment"}</button>
+              </form>
+            )}
           </div>
         </article>
       </div>
