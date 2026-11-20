@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "admin:create": "node --env-file=.env src/scripts/create-admin.js"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
