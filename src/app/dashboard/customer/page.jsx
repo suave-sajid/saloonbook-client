@@ -2,7 +2,16 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { ArrowRight, CalendarCheck2, CalendarClock, CalendarDays, CircleX } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { apiRequest } from "@/lib/server-api";
+
+const metricConfig = [
+  { key: "total", label: "Total requests", icon: CalendarDays },
+  { key: "pending", label: "Pending", icon: CalendarClock },
+  { key: "confirmed", label: "Confirmed", icon: CalendarCheck2 },
+  { key: "cancelled", label: "Cancelled", icon: CircleX },
+];
 
 export default function CustomerOverview() {
   const [appointments, setAppointments] = useState([]);
@@ -15,16 +24,37 @@ export default function CustomerOverview() {
   };
   return (
     <div>
-      <h1 className="font-serif text-3xl text-[#342c24] dark:text-stone-100">Customer overview</h1>
+      <div className="flex flex-col gap-1">
+        <h1 className="text-2xl font-semibold tracking-tight">Overview</h1>
+        <p className="text-sm text-muted-foreground">Keep track of your salon appointments.</p>
+      </div>
       <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {Object.entries(counts).map(([label, value]) => (
-          <div key={label} className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-900">
-            <p className="text-xs font-semibold uppercase tracking-wider text-stone-500">{label}</p>
-            <p className="mt-2 text-3xl font-semibold text-[#1f493c] dark:text-emerald-300">{value}</p>
-          </div>
+        {metricConfig.map(({ key, label, icon: Icon }) => (
+          <article key={key} className="rounded-xl border bg-card p-5 text-card-foreground shadow-sm">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm font-medium text-muted-foreground">{label}</p>
+              <span className="flex size-9 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+                <Icon aria-hidden="true" className="size-4" />
+              </span>
+            </div>
+            <p className="mt-4 text-3xl font-semibold tracking-tight">{counts[key]}</p>
+          </article>
         ))}
       </div>
-      <Link href="/dashboard/customer/appointments" className="mt-6 inline-flex rounded-full bg-[#1f493c] px-5 py-3 text-sm font-semibold text-white">View my appointments</Link>
+      <section className="mt-6 rounded-xl border bg-card p-6 text-card-foreground shadow-sm sm:p-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-lg font-semibold tracking-tight">Your appointments</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Review request status or continue to payment for confirmed visits.
+            </p>
+          </div>
+          <Button render={<Link href="/dashboard/customer/appointments" />}>
+            View appointments
+            <ArrowRight aria-hidden="true" />
+          </Button>
+        </div>
+      </section>
     </div>
   );
 }
