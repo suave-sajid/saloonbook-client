@@ -1,9 +1,10 @@
 import { betterAuth } from "better-auth";
+import { jwt } from "better-auth/plugins";
 import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
 
-const client = new MongoClient(process.env.MONGODB_URI);
-const db = client.db(process.env.DB_NAME);
+export const client = new MongoClient(process.env.MONGODB_URI);
+export const db = client.db(process.env.DB_NAME);
 
 export const auth = betterAuth({
     database: mongodbAdapter(db, {
@@ -29,10 +30,23 @@ export const auth = betterAuth({
             },
         },
     },
-    //   socialProviders: { 
-    //     github: { 
-    //       clientId: process.env.GITHUB_CLIENT_ID, 
-    //       clientSecret: process.env.GITHUB_CLIENT_SECRET, 
-    //     }, 
-    //   },
+    plugins: [
+        jwt({
+            jwt: {
+                definePayload: ({ user }) => ({
+                    id: user.id,
+                    email: user.email,
+                    role: user.role,
+                }),
+            },
+        }),
+    ],
+    socialProviders: process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+        ? {
+            google: {
+                clientId: process.env.GOOGLE_CLIENT_ID,
+                clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            },
+        }
+        : {},
 });

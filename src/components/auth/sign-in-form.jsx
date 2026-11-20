@@ -36,7 +36,9 @@ export default function SignInForm() {
       }
 
       toast.success("Signed in successfully");
-      router.replace("/");
+      const session = await authClient.getSession();
+      const role = session?.data?.user?.role;
+      router.replace(role === "admin" ? "/dashboard/admin" : "/dashboard/customer");
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -49,6 +51,7 @@ export default function SignInForm() {
   };
 
   return (
+    <>
     <form className="auth-form-fields space-y-4" onSubmit={handleSubmit}>
         <AuthField
           autoComplete="email"
@@ -85,5 +88,16 @@ export default function SignInForm() {
           {isSubmitting ? "Signing in..." : "Sign in"}
         </Button>
     </form>
+    <button
+      type="button"
+      onClick={async () => {
+        const { error } = await authClient.signIn.social({ provider: "google", callbackURL: "/dashboard" });
+        if (error) toast.error(error.message || "Google sign-in failed.");
+      }}
+      className="mt-3 h-11 w-full rounded-lg border border-stone-300 bg-white text-sm font-semibold text-stone-700"
+    >
+      Continue with Google
+    </button>
+    </>
   );
 }

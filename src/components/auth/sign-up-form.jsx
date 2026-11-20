@@ -33,6 +33,10 @@ export default function SignUpForm() {
     const name = String(formData.get("full-name") ?? "").trim();
     const email = String(formData.get("email") ?? "").trim();
     const password = String(formData.get("password") ?? "");
+    if (password.length < 6 || !/[A-Z]/.test(password) || !/[a-z]/.test(password)) {
+      toast.error("Password must be at least 6 characters and include one uppercase and one lowercase letter.");
+      return;
+    }
     const profileImageUrl = String(
       formData.get("profile-image-url") ?? "",
     ).trim();

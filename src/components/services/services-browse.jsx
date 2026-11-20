@@ -26,6 +26,8 @@ export default function ServicesBrowse({ initialCategory = "" }) {
   const [services, setServices] = useState([]);
   const [status, setStatus] = useState("loading");
   const [retryCount, setRetryCount] = useState(0);
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState("");
 
   useEffect(() => {
     const controller = new AbortController();
@@ -33,6 +35,8 @@ export default function ServicesBrowse({ initialCategory = "" }) {
       try {
         const url = new URL(getServicesEndpoint());
         if (category) url.searchParams.set("category", category);
+        if (search.trim()) url.searchParams.set("search", search.trim());
+        if (sort) url.searchParams.set("sort", sort);
 
         const response = await fetch(url, {
           cache: "no-store",
@@ -65,7 +69,7 @@ export default function ServicesBrowse({ initialCategory = "" }) {
 
     loadServices();
     return () => controller.abort();
-  }, [category, retryCount]);
+  }, [category, retryCount, search, sort]);
 
   const updateCategory = (nextCategory) => {
     setCategory(nextCategory);
@@ -103,7 +107,17 @@ export default function ServicesBrowse({ initialCategory = "" }) {
                 for you.
               </p>
             </div>
-            <label className="flex w-full flex-col gap-2 text-xs font-semibold text-[#6f6559] dark:text-stone-300 sm:w-64">
+            <div className="grid w-full gap-3 sm:grid-cols-2 lg:w-[560px]">
+            <label className="flex w-full flex-col gap-2 text-xs font-semibold text-[#6f6559] dark:text-stone-300">
+              Search by name
+              <input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search services..."
+                className="h-11 rounded-xl border border-[#ded5c8] bg-[#fffefa] px-3 text-sm font-medium text-[#342c24] outline-none dark:border-stone-700 dark:bg-stone-950 dark:text-stone-100"
+              />
+            </label>
+            <label className="flex w-full flex-col gap-2 text-xs font-semibold text-[#6f6559] dark:text-stone-300">
               Filter by category
               <select
                 className="h-11 rounded-xl border border-[#ded5c8] bg-[#fffefa] px-3 text-sm font-medium text-[#342c24] outline-none transition focus:border-[#8c9b8b] focus:ring-2 focus:ring-[#8c9b8b]/20 dark:border-stone-700 dark:bg-stone-950 dark:text-stone-100"
@@ -116,6 +130,15 @@ export default function ServicesBrowse({ initialCategory = "" }) {
                 ))}
               </select>
             </label>
+            <label className="flex w-full flex-col gap-2 text-xs font-semibold text-[#6f6559] dark:text-stone-300 sm:col-span-2">
+              Sort by price
+              <select value={sort} onChange={(event) => setSort(event.target.value)} className="h-11 rounded-xl border border-[#ded5c8] bg-[#fffefa] px-3 text-sm font-medium dark:border-stone-700 dark:bg-stone-950">
+                <option value="">Newest first</option>
+                <option value="price-asc">Price: low to high</option>
+                <option value="price-desc">Price: high to low</option>
+              </select>
+            </label>
+            </div>
           </div>
         </div>
       </section>
