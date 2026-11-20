@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import ThemeToggle from "@/components/theme-toggle";
-import LinkComponent from "next/link";
+import Link from "next/link";
 import Image from "next/image";
 import {
   ChevronDown,
@@ -66,7 +66,19 @@ export default function Navbar() {
   };
 
   const profileLink = (
-    <LinkComponent
+    <div className="space-y-1">
+    <Link
+      className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-100 dark:text-stone-200 dark:hover:bg-stone-800"
+      href="/dashboard"
+      onClick={() => {
+        setProfileMenuOpen(false);
+        setMenuOpen(false);
+      }}
+    >
+      <UserRound aria-hidden="true" className="size-4" />
+      Dashboard
+    </Link>
+    <Link
       className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-100 dark:text-stone-200 dark:hover:bg-stone-800"
       href="/profile"
       onClick={() => {
@@ -76,7 +88,8 @@ export default function Navbar() {
     >
       <UserRound aria-hidden="true" className="size-4" />
       Profile management
-    </LinkComponent>
+    </Link>
+    </div>
   );
 
   return (
@@ -85,7 +98,7 @@ export default function Navbar() {
         aria-label="Main navigation"
         className="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-12"
       >
-        <LinkComponent
+        <Link
           aria-label="SalonBook home"
           className="flex shrink-0 items-center gap-2.5"
           href="/"
@@ -109,17 +122,17 @@ export default function Navbar() {
           <span className="font-serif text-[21px] font-semibold tracking-tight text-[#233d32] dark:text-emerald-100">
             SalonBook
           </span>
-        </LinkComponent>
+        </Link>
 
         <div className="hidden items-center gap-8 lg:flex">
           {navigationLinks.map((item) => (
-            <LinkComponent
+            <Link
               className="text-sm font-medium text-stone-600 transition-colors hover:text-[#1f493c] dark:text-stone-300 dark:hover:text-emerald-300"
               href={item.href}
               key={item.label}
             >
               {item.label}
-            </LinkComponent>
+            </Link>
           ))}
         </div>
 
@@ -184,14 +197,14 @@ export default function Navbar() {
             <>
               <Button
                 className="h-10 rounded-full px-5 text-sm font-semibold text-[#29483c] hover:bg-[#e9eee8] dark:text-emerald-100 dark:hover:bg-stone-800"
-                render={<LinkComponent href="/sign-in" />}
+                render={<Link href="/sign-in" />}
                 variant="ghost"
               >
                 Sign In
               </Button>
               <Button
                 className="h-10 rounded-full bg-[#1f493c] px-5 text-sm font-semibold text-white hover:bg-[#17392f]"
-                render={<LinkComponent href="/sign-up" />}
+                render={<Link href="/sign-up" />}
               >
                 Get Started
               </Button>
@@ -227,14 +240,14 @@ export default function Navbar() {
         >
           <div className="mx-auto flex max-w-7xl flex-col gap-1">
             {navigationLinks.map((item) => (
-              <LinkComponent
+              <Link
                 className="rounded-lg px-3 py-3 text-sm font-medium text-stone-700 transition-colors hover:bg-[#eeece5] hover:text-[#1f493c] dark:text-stone-200 dark:hover:bg-stone-800 dark:hover:text-emerald-200"
                 href={item.href}
                 key={item.label}
                 onClick={() => setMenuOpen(false)}
               >
                 {item.label}
-              </LinkComponent>
+              </Link>
             ))}
             <div className="mt-3 flex items-center gap-3 border-t border-stone-200 pt-4 dark:border-stone-800">
               <ThemeToggle />
@@ -272,7 +285,7 @@ export default function Navbar() {
               <Button
                 className="h-11 flex-1 rounded-full text-[#29483c]"
                 onClick={() => setMenuOpen(false)}
-                render={<LinkComponent href="/sign-in" />}
+                render={<Link href="/sign-in" />}
                 variant="outline"
               >
                 Sign In
@@ -280,7 +293,7 @@ export default function Navbar() {
               <Button
                 className="h-11 flex-1 rounded-full bg-[#1f493c] text-white hover:bg-[#17392f]"
                 onClick={() => setMenuOpen(false)}
-                render={<LinkComponent href="/sign-up" />}
+                render={<Link href="/sign-up" />}
               >
                 Get Started
               </Button>
