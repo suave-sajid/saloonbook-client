@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, CalendarCheck2, CalendarClock, CalendarDays, CircleX } from "lucide-react";
+import { ArrowRight, CalendarCheck2, CalendarClock, CalendarDays, CircleAlert, CircleX, LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { apiRequest } from "@/lib/server-api";
 
@@ -15,7 +15,29 @@ const metricConfig = [
 
 export default function CustomerOverview() {
   const [appointments, setAppointments] = useState([]);
-  useEffect(() => { apiRequest("/api/appointments/my").then((r) => setAppointments(r.data || [])).catch(() => setAppointments([])); }, []);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const loadAppointments = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const result = await apiRequest("/api/appointments/my");
+      setAppointments(Array.isArray(result.data) ? result.data : []);
+    } catch (requestError) {
+      setError(requestError.message || "Could not load your appointments.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    apiRequest("/api/appointments/my")
+      .then((result) => setAppointments(Array.isArray(result.data) ? result.data : []))
+      .catch((requestError) => setError(requestError.message || "Could not load your appointments."))
+      .finally(() => setLoading(false));
+  }, []);
+
   const counts = {
     total: appointments.length,
     pending: appointments.filter((a) => a.status === "pending").length,
@@ -37,11 +59,27 @@ export default function CustomerOverview() {
                 <Icon aria-hidden="true" className="size-4" />
               </span>
             </div>
-            <p className="mt-4 text-3xl font-semibold tracking-tight">{counts[key]}</p>
+            <p className="mt-4 text-3xl font-semibold tracking-tight">
+              {loading || error ? <span className="text-muted-foreground">—</span> : counts[key]}
+            </p>
           </article>
         ))}
       </div>
       <section className="mt-6 rounded-xl border bg-card p-6 text-card-foreground shadow-sm sm:p-8">
+        {loading ? (
+          <p aria-live="polite" className="flex items-center gap-2 text-sm text-muted-foreground" role="status">
+            <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
+            Loading your appointment summary...
+          </p>
+        ) : error ? (
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" role="alert">
+            <p className="flex items-center gap-2 text-sm text-destructive">
+              <CircleAlert aria-hidden="true" className="size-4 shrink-0" />
+              {error}
+            </p>
+            <Button onClick={loadAppointments} variant="outline">Try again</Button>
+          </div>
+        ) : (
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-lg font-semibold tracking-tight">Your appointments</h2>
@@ -54,6 +92,7 @@ export default function CustomerOverview() {
             <ArrowRight aria-hidden="true" />
           </Button>
         </div>
+        )}
       </section>
     </div>
   );

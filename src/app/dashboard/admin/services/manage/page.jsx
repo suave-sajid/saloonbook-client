@@ -29,17 +29,19 @@ export default function ManageServices() {
   const [form, setForm] = useState(emptyForm);
   const [editing, setEditing] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [saving, setSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const imageInputRef = useRef(null);
 
   const load = async () => {
     setLoading(true);
+    setLoadError("");
     try {
       const result = await apiRequest("/api/admin/services");
-      setServices(result.data || []);
+      setServices(Array.isArray(result.data) ? result.data : []);
     } catch (error) {
-      toast.error(error.message || "Couldn’t load services.");
+      setLoadError(error.message || "Couldn’t load services.");
     } finally {
       setLoading(false);
     }
@@ -47,8 +49,8 @@ export default function ManageServices() {
 
   useEffect(() => {
     apiRequest("/api/admin/services")
-      .then((result) => setServices(result.data || []))
-      .catch((error) => toast.error(error.message || "Couldn’t load services."))
+      .then((result) => setServices(Array.isArray(result.data) ? result.data : []))
+      .catch((error) => setLoadError(error.message || "Couldn’t load services."))
       .finally(() => setLoading(false));
   }, []);
 
@@ -262,6 +264,11 @@ export default function ManageServices() {
         </div>
         {loading ? (
           <p aria-live="polite" className="p-8 text-center text-sm text-muted-foreground">Loading services...</p>
+        ) : loadError ? (
+          <div className="p-8 text-center" role="alert">
+            <p className="text-sm text-destructive">{loadError}</p>
+            <Button className="mt-4" onClick={load} variant="outline">Try again</Button>
+          </div>
         ) : services.length === 0 ? (
           <p className="p-8 text-center text-sm text-muted-foreground">No services to manage yet.</p>
         ) : (

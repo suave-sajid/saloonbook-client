@@ -6,6 +6,7 @@ import {
   CalendarDays,
   Clock3,
   CreditCard,
+  CircleAlert,
   ImageOff,
   Info,
   LoaderCircle,
@@ -58,16 +59,31 @@ function StatusBadge({ value, type }) {
 export default function CustomerAppointments() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [selected, setSelected] = useState(null);
   const [cancelTarget, setCancelTarget] = useState(null);
   const [cancellingId, setCancellingId] = useState("");
   const [payingId, setPayingId] = useState("");
 
-  const load = () => apiRequest("/api/appointments/my")
-    .then((result) => setAppointments(result.data || []))
-    .finally(() => setLoading(false));
+  const load = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const result = await apiRequest("/api/appointments/my");
+      setAppointments(Array.isArray(result.data) ? result.data : []);
+    } catch (requestError) {
+      setError(requestError.message || "Could not load your appointments.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    apiRequest("/api/appointments/my")
+      .then((result) => setAppointments(Array.isArray(result.data) ? result.data : []))
+      .catch((requestError) => setError(requestError.message || "Could not load your appointments."))
+      .finally(() => setLoading(false));
+  }, []);
 
   const cancel = async (id) => {
     if (!id) return;
@@ -111,7 +127,13 @@ export default function CustomerAppointments() {
         <p className="mt-1 text-sm text-muted-foreground">Review your requests, appointment details, and payment status.</p>
       </div>
 
-      {appointments.length ? (
+      {error ? (
+        <div className="mt-6 rounded-xl border border-destructive/30 bg-card p-8 text-center" role="alert">
+          <CircleAlert aria-hidden="true" className="mx-auto size-6 text-destructive" />
+          <p className="mt-3 text-sm text-muted-foreground">{error}</p>
+          <button className="mt-4 rounded-lg border px-4 py-2 text-sm font-medium hover:bg-accent" onClick={load} type="button">Try again</button>
+        </div>
+      ) : appointments.length ? (
         <div className="mt-6 grid gap-4">
           {appointments.map((item) => {
             const service = item.service;
