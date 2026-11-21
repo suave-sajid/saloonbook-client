@@ -27,7 +27,7 @@ export default function ServiceCategories() {
         </div>
 
         <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4 lg:gap-6">
-          {SERVICE_CATEGORIES.map((category) => (
+          {SERVICE_CATEGORIES.map((category, index) => (
             <Link
               aria-label={`Explore ${category.name} services`}
               className="group relative isolate aspect-[0.82/1] overflow-hidden rounded-2xl bg-[#e8dfd3] shadow-[0_12px_35px_-28px_rgba(57,43,29,0.5)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_45px_-28px_rgba(57,43,29,0.42)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#66806e] sm:aspect-[0.92/1] lg:aspect-[0.82/1]"
@@ -38,6 +38,7 @@ export default function ServiceCategories() {
                 alt={category.alt}
                 className="object-cover transition duration-700 ease-out group-hover:scale-[1.06]"
                 fill
+                loading={index === 0 ? "eager" : "lazy"}
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 src={category.image}
               />
