@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Pencil, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Camera, LoaderCircle, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { apiRequest } from "@/lib/server-api";
@@ -22,7 +22,6 @@ const fields = [
   ["category", "Category", "text"],
   ["price", "Price (৳)", "number"],
   ["duration", "Duration (minutes)", "number"],
-  ["image", "Image URL", "url"],
 ];
 
 export default function ManageServices() {
@@ -31,6 +30,8 @@ export default function ManageServices() {
   const [editing, setEditing] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const imageInputRef = useRef(null);
 
   const load = async () => {
     setLoading(true);
@@ -56,8 +57,43 @@ export default function ManageServices() {
     setEditing(null);
   };
 
+  const uploadImage = async (event) => {
+    const file = event.currentTarget.files?.[0];
+    event.currentTarget.value = "";
+    if (!file) return;
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      toast.error("Choose a PNG, JPG, or WEBP image.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Choose an image smaller than 5 MB.");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const body = new FormData();
+      body.set("image", file);
+      const result = await apiRequest("/api/upload/image", {
+        method: "POST",
+        body,
+      });
+      if (!result.url) throw new Error("The image upload returned no URL.");
+      setForm((current) => ({ ...current, image: result.url }));
+      toast.success("Service image uploaded.");
+    } catch (error) {
+      toast.error(error.message || "Couldn’t upload the service image.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const save = async (event) => {
     event.preventDefault();
+    if (!form.image.trim()) {
+      toast.error("Upload a service image before saving.");
+      return;
+    }
     setSaving(true);
     try {
       await apiRequest(
@@ -158,6 +194,34 @@ export default function ManageServices() {
               />
             </label>
           ))}
+          <div className="rounded-lg border border-dashed p-4 sm:col-span-2">
+            <p className="text-sm font-medium">Service image</p>
+            <p className="mt-1 text-xs text-muted-foreground">PNG, JPG or WEBP, up to 5 MB.</p>
+            {form.image && (
+              <img
+                alt="Service image preview"
+                className="mt-3 h-32 w-full rounded-md object-cover"
+                src={form.image}
+              />
+            )}
+            <Button
+              className="mt-3"
+              disabled={isUploading}
+              onClick={() => imageInputRef.current?.click()}
+              type="button"
+              variant="outline"
+            >
+              {isUploading ? <LoaderCircle aria-hidden="true" className="animate-spin" /> : <Camera aria-hidden="true" />}
+              {isUploading ? "Uploading..." : form.image ? "Replace image" : "Upload image"}
+            </Button>
+            <input
+              accept="image/png,image/jpeg,image/webp"
+              className="sr-only"
+              onChange={uploadImage}
+              ref={imageInputRef}
+              type="file"
+            />
+          </div>
           <label className="text-sm font-medium">
             Status
             <select

@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { Camera, LoaderCircle, Save, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import { apiRequest } from "@/lib/server-api";
 
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
@@ -37,9 +38,16 @@ function ProfileEditor({ user }) {
   const router = useRouter();
   const [name, setName] = useState(user.name || "");
   const [image, setImage] = useState(user.image || "");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const inputRef = useRef(null);
+
+  useEffect(() => {
+    apiRequest("/api/profile")
+      .then((result) => setPhoneNumber(result.data?.phoneNumber || ""))
+      .catch(() => {});
+  }, []);
 
   const handleImageChange = async (event) => {
     const file = event.currentTarget.files?.[0];
@@ -95,6 +103,10 @@ function ProfileEditor({ user }) {
         toast.error(error.message || "We couldn't update your profile.");
         return;
       }
+      await apiRequest("/api/profile", {
+        method: "PATCH",
+        body: JSON.stringify({ phoneNumber: phoneNumber.trim() }),
+      });
       toast.success("Your profile has been updated.");
       router.refresh();
     } catch (error) {
@@ -185,6 +197,24 @@ function ProfileEditor({ user }) {
                 value={name}
               />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <label
+              className="text-sm font-medium text-stone-700 dark:text-stone-300"
+              htmlFor="profile-phone"
+            >
+              Phone number
+            </label>
+            <input
+              className="h-11 w-full rounded-lg border border-stone-300 bg-white px-4 text-sm text-stone-950 outline-none transition placeholder:text-stone-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 dark:border-stone-700 dark:bg-stone-950 dark:text-white dark:focus:border-emerald-400"
+              id="profile-phone"
+              maxLength={30}
+              onChange={(event) => setPhoneNumber(event.target.value)}
+              placeholder="+880 1XXX-XXXXXX"
+              type="tel"
+              value={phoneNumber}
+            />
           </div>
 
           <div className="space-y-2">
