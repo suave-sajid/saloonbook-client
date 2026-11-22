@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { CircleAlert, Eye, LoaderCircle, Mail, MapPin, Phone, UserRound, X } from "lucide-react";
 import { apiRequest } from "@/lib/server-api";
+import { getImageSource, shouldOptimizeImage } from "@/lib/image-optimization";
 import { toast } from "sonner";
 
 function formatDate(value) {
@@ -112,8 +113,8 @@ export default function AdminUsers() {
                     className="object-cover"
                     fill
                     sizes="48px"
-                    src={user.image || "/avatar-default.svg"}
-                    unoptimized
+                    src={getImageSource(user.image)}
+                    unoptimized={!shouldOptimizeImage(user.image || "/avatar-default.svg")}
                   />
                 </div>
                 <div className="min-w-0">
@@ -201,8 +202,8 @@ export default function AdminUsers() {
                   className="object-cover"
                   fill
                   sizes="64px"
-                  src={selected.image || "/avatar-default.svg"}
-                  unoptimized
+                  src={getImageSource(selected.image)}
+                  unoptimized={!shouldOptimizeImage(selected.image || "/avatar-default.svg")}
                 />
               </div>
               <div className="min-w-0">

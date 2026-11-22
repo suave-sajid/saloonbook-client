@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Link2, Upload, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { getImageSource, shouldOptimizeImage } from "@/lib/image-optimization";
 
 export function AuthField({
   autoComplete,
@@ -179,8 +180,8 @@ export function ProfileImageField({ onUploadChange }) {
             className="object-cover"
             fill
             sizes="56px"
-            src={previewUrl || "/avatar-default.svg"}
-            unoptimized
+            src={getImageSource(previewUrl)}
+            unoptimized={!shouldOptimizeImage(previewUrl || "/avatar-default.svg")}
           />
           {uploadState === "uploading" && (
             <span

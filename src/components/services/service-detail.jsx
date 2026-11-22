@@ -2,6 +2,7 @@
 "use client";
 
 import Image from "next/image";
+import { getImageSource, shouldOptimizeImage } from "@/lib/image-optimization";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -201,11 +202,11 @@ export default function ServiceDetail({ service }) {
           <div className="relative min-h-64 bg-[#eee8de] sm:min-h-96 lg:min-h-[560px]">
             {image ? (
               <Image
-                src={image}
+                src={getImageSource(image)}
                 alt={service.serviceName || "Salon service"}
                 fill
                 priority
-                unoptimized
+                unoptimized={!shouldOptimizeImage(image)}
                 sizes="(max-width: 1024px) 100vw, 52vw"
                 className="object-cover"
               />

@@ -2,21 +2,21 @@ export const SITE_CONFIG = {
   contact: {
     email: {
       label: "Email",
-      value: "Business email to be announced",
-      href: null,
+      value: "admin@salonbook.com",
+      href: "mailto:admin@salonbook.com",
     },
     phone: {
       label: "Phone",
-      value: "Business phone to be announced",
-      href: null,
+      value: "01645351284",
+      href: "tel:01645351284",
     },
     address: {
       label: "Location",
-      value: "Salon location to be announced",
+      value: "Agrabad, Chattagram, Bangladesh",
       href: null,
     },
   },
-  openingHours: "Opening hours to be announced",
+  openingHours: "Opening at 8:00 AM",
   socialMedia: [
     { name: "Instagram", href: null },
     { name: "Facebook", href: null },

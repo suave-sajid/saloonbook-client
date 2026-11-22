@@ -28,8 +28,8 @@ export default function ContactPage() {
             Contact SalonBook
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-7 text-[#81766a] dark:text-stone-400">
-            Our official contact details are being prepared. Please check back
-            soon for ways to reach the SalonBook team.
+            Reach our team by email or phone, or visit us in Agrabad. We look
+            forward to helping with your salon booking.
           </p>
 
           <div className="mt-10 grid gap-4 sm:grid-cols-2">
@@ -46,7 +46,16 @@ export default function ContactPage() {
                   <h2 className="mt-4 text-sm font-semibold text-[#342c24] dark:text-stone-100">
                     {item.label}
                   </h2>
-                  <p className="mt-1 text-sm text-[#81766a] dark:text-stone-400">{item.value}</p>
+                  {item.href ? (
+                    <a
+                      className="mt-1 inline-block text-sm text-[#365a48] hover:underline dark:text-emerald-300"
+                      href={item.href}
+                    >
+                      {item.value}
+                    </a>
+                  ) : (
+                    <p className="mt-1 text-sm text-[#81766a] dark:text-stone-400">{item.value}</p>
+                  )}
                 </div>
               );
             })}

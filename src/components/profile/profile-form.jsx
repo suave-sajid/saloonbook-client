@@ -16,6 +16,7 @@ import {
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { apiRequest } from "@/lib/server-api";
+import { getImageSource, getImageValue, shouldOptimizeImage } from "@/lib/image-optimization";
 import { Button } from "@/components/ui/button";
 
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -99,7 +100,11 @@ export default function ProfileForm() {
     setLoadError("");
     try {
       const result = await apiRequest("/api/profile");
-      const loadedProfile = { ...initialProfile, ...result.data };
+      const loadedProfile = {
+        ...initialProfile,
+        ...result.data,
+        image: getImageValue(result.data?.image),
+      };
       setProfile(loadedProfile);
       setDraft(loadedProfile);
     } catch (error) {
@@ -120,7 +125,11 @@ export default function ProfileForm() {
     apiRequest("/api/profile")
       .then((result) => {
         if (active) {
-          const loadedProfile = { ...initialProfile, ...result.data };
+          const loadedProfile = {
+            ...initialProfile,
+            ...result.data,
+            image: getImageValue(result.data?.image),
+          };
           setProfile(loadedProfile);
           setDraft(loadedProfile);
         }
@@ -290,8 +299,8 @@ export default function ProfileForm() {
               className="object-cover"
               fill
               sizes="80px"
-              src={profile.image || "/avatar-default.svg"}
-              unoptimized
+              src={getImageSource(profile.image)}
+              unoptimized={!shouldOptimizeImage(profile.image || "/avatar-default.svg")}
             />
           </div>
           <div className="min-w-0 flex-1">
@@ -331,7 +340,7 @@ export default function ProfileForm() {
 
             <div className="mb-6 flex flex-col gap-4 rounded-lg border bg-muted/30 p-4 sm:flex-row sm:items-center">
               <div className="relative size-20 shrink-0 overflow-hidden rounded-full border bg-muted">
-                <Image alt="Profile photo preview" className="object-cover" fill sizes="80px" src={draft.image || "/avatar-default.svg"} unoptimized />
+                <Image alt="Profile photo preview" className="object-cover" fill sizes="80px" src={getImageSource(draft.image)} unoptimized={!shouldOptimizeImage(draft.image)} />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium">Profile photo</p>

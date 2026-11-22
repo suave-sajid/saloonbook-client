@@ -14,6 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { apiRequest } from "@/lib/server-api";
+import { getImageSource, shouldOptimizeImage } from "@/lib/image-optimization";
 import { toast } from "sonner";
 
 function formatDate(value) {
@@ -149,8 +150,8 @@ export default function CustomerAppointments() {
                         className="object-cover"
                         fill
                         sizes="(max-width: 640px) 100vw, 208px"
-                        src={image}
-                        unoptimized
+                        src={getImageSource(image)}
+                        unoptimized={!shouldOptimizeImage(image)}
                       />
                     ) : (
                       <div className="flex h-full items-center justify-center text-muted-foreground" role="img" aria-label="Service image unavailable">

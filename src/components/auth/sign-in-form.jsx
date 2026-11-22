@@ -36,9 +36,10 @@ export default function SignInForm() {
       }
 
       toast.success("Signed in successfully");
-      const session = await authClient.getSession();
-      const role = session?.data?.user?.role;
-      router.replace(role === "admin" ? "/dashboard/admin" : "/dashboard/customer");
+      // const session = await authClient.getSession();
+      // const role = session?.data?.user?.role;
+      // router.replace(role === "admin" ? "/dashboard/admin" : "/dashboard/customer");
+      router.replace("/");
     } catch (error) {
       toast.error(
         error instanceof Error

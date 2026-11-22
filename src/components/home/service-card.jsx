@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { getImageSource, shouldOptimizeImage } from "@/lib/image-optimization";
 import { ArrowUpRight, Clock3, Scissors } from "lucide-react";
 
 function getServiceImage(service) {
@@ -45,8 +46,8 @@ export default function ServiceCard({ service }) {
             fill
             onError={() => setImageFailed(true)}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            src={image}
-            unoptimized
+            src={getImageSource(image)}
+            unoptimized={!shouldOptimizeImage(image)}
           />
         ) : (
           <div

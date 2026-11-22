@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { authClient } from "@/lib/auth-client";
+import { getImageSource, shouldOptimizeImage } from "@/lib/image-optimization";
 import { toast } from "sonner";
 
 const navigationLinks = [
@@ -153,8 +154,8 @@ export default function Navbar() {
                     alt=""
                     className="size-9 rounded-full object-cover"
                     height={36}
-                    src={user.image}
-                    unoptimized
+                    src={getImageSource(user.image)}
+                    unoptimized={!shouldOptimizeImage(user.image)}
                     width={36}
                   />
                 ) : (
@@ -259,8 +260,8 @@ export default function Navbar() {
                         alt=""
                         className="size-9 rounded-full object-cover"
                         height={36}
-                        src={user.image}
-                        unoptimized
+                        src={getImageSource(user.image)}
+                        unoptimized={!shouldOptimizeImage(user.image)}
                         width={36}
                       />
                     ) : (

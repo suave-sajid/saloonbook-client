@@ -44,7 +44,7 @@ export default function SignUpForm() {
     try {
       setSubmitState("creating");
       const image = profileImage.url || profileImageUrl
-        || new URL("/avatar-default.svg", window.location.origin).toString();
+        || "/avatar-default.svg";
 
       const { error } = await authClient.signUp.email({
         name,
