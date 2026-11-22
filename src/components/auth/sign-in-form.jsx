@@ -8,6 +8,7 @@ import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import GoogleAuthButton from "./google-auth-button";
 
 export default function SignInForm() {
   const router = useRouter();
@@ -89,16 +90,12 @@ export default function SignInForm() {
           {isSubmitting ? "Signing in..." : "Sign in"}
         </Button>
     </form>
-    <button
-      type="button"
-      onClick={async () => {
-        const { error } = await authClient.signIn.social({ provider: "google", callbackURL: "/dashboard" });
-        if (error) toast.error(error.message || "Google sign-in failed.");
-      }}
-      className="mt-3 h-11 w-full rounded-lg border border-stone-300 bg-white text-sm font-semibold text-stone-700"
-    >
-      Continue with Google
-    </button>
+    <div className="my-4 flex items-center gap-3 text-xs text-stone-500">
+      <span className="h-px flex-1 bg-stone-200 dark:bg-stone-700" />
+      <span>or continue with</span>
+      <span className="h-px flex-1 bg-stone-200 dark:bg-stone-700" />
+    </div>
+    <GoogleAuthButton />
     </>
   );
 }

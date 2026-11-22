@@ -48,6 +48,10 @@ export default function AdminUsers() {
   }, []);
 
   useEffect(() => {
+    load();
+  }, [load]);
+
+  useEffect(() => {
     apiRequest("/api/admin/users")
       .then((result) => setUsers(Array.isArray(result.data) ? result.data : []))
       .catch((requestError) => setError(requestError.message || "Could not load customers."))
@@ -75,6 +79,7 @@ export default function AdminUsers() {
       toast.error(requestError.message || "Could not update this account.");
     }
   };
+
 
   return (
     <div>

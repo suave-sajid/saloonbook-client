@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Camera, LoaderCircle, Pencil, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Camera, CircleAlert, LoaderCircle, Pencil, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { apiRequest } from "@/lib/server-api";
@@ -32,6 +32,8 @@ export default function ManageServices() {
   const [loadError, setLoadError] = useState("");
   const [saving, setSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deletingId, setDeletingId] = useState("");
   const imageInputRef = useRef(null);
 
   const load = async () => {
@@ -46,6 +48,9 @@ export default function ManageServices() {
       setLoading(false);
     }
   };
+  useEffect(() => {
+    load();
+  }, []);
 
   useEffect(() => {
     apiRequest("/api/admin/services")
@@ -53,6 +58,15 @@ export default function ManageServices() {
       .catch((error) => setLoadError(error.message || "Couldn’t load services."))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (!deleteTarget || deletingId) return undefined;
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setDeleteTarget(null);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [deleteTarget, deletingId]);
 
   const resetForm = () => {
     setForm(emptyForm);
@@ -147,15 +161,19 @@ export default function ManageServices() {
     }
   };
 
-  const remove = async (service) => {
-    if (!window.confirm(`Delete “${service.serviceName}”? This cannot be undone.`)) return;
+  const remove = async () => {
+    if (!deleteTarget) return;
+    setDeletingId(deleteTarget._id);
     try {
-      await apiRequest(`/api/admin/services/${service._id}`, { method: "DELETE" });
+      await apiRequest(`/api/admin/services/${deleteTarget._id}`, { method: "DELETE" });
       toast.success("Service deleted");
-      if (editing === service._id) resetForm();
+      if (editing === deleteTarget._id) resetForm();
+      setDeleteTarget(null);
       await load();
     } catch (error) {
       toast.error(error.message || "Couldn’t delete service.");
+    } finally {
+      setDeletingId("");
     }
   };
 
@@ -280,11 +298,10 @@ export default function ManageServices() {
                   <p className="mt-1 text-sm text-muted-foreground">
                     {service.category} · ৳{service.price} · {service.duration} min
                   </p>
-                  <span className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${
-                    service.status === "active"
+                  <span className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${service.status === "active"
                       ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
                       : "bg-muted text-muted-foreground"
-                  }`}>
+                    }`}>
                     {service.status === "active" ? "Active" : "Inactive"}
                   </span>
                 </div>
@@ -296,7 +313,7 @@ export default function ManageServices() {
                     <Pencil aria-hidden="true" />
                     Edit
                   </Button>
-                  <Button onClick={() => remove(service)} size="sm" variant="destructive">
+                  <Button onClick={() => setDeleteTarget(service)} size="sm" variant="destructive">
                     <Trash2 aria-hidden="true" />
                     Delete
                   </Button>
@@ -306,6 +323,65 @@ export default function ManageServices() {
           </div>
         )}
       </section>
+
+      {deleteTarget && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !deletingId) setDeleteTarget(null);
+          }}
+          role="presentation"
+        >
+          <section
+            aria-describedby="delete-service-description"
+            aria-labelledby="delete-service-title"
+            aria-modal="true"
+            className="w-full max-w-md rounded-2xl border bg-card p-6 shadow-xl"
+            role="alertdialog"
+          >
+            <div className="flex items-start gap-4">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                <CircleAlert aria-hidden="true" className="size-5" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <h2 className="font-semibold" id="delete-service-title">Delete this service?</h2>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground" id="delete-service-description">
+                  “{deleteTarget.serviceName}” will be permanently removed. This action cannot be undone.
+                </p>
+              </div>
+              <button
+                aria-label="Close delete confirmation"
+                className="flex size-8 shrink-0 items-center justify-center rounded-lg border hover:bg-accent disabled:opacity-50"
+                disabled={Boolean(deletingId)}
+                onClick={() => setDeleteTarget(null)}
+                type="button"
+              >
+                <X aria-hidden="true" className="size-4" />
+              </button>
+            </div>
+            <div className="mt-6 flex flex-col-reverse justify-end gap-2 sm:flex-row">
+              <Button
+                disabled={Boolean(deletingId)}
+                onClick={() => setDeleteTarget(null)}
+                type="button"
+                variant="outline"
+              >
+                Keep service
+              </Button>
+              <Button
+                className="gap-2"
+                disabled={Boolean(deletingId)}
+                onClick={remove}
+                type="button"
+                variant="destructive"
+              >
+                {deletingId ? <LoaderCircle aria-hidden="true" className="animate-spin" /> : <Trash2 aria-hidden="true" />}
+                {deletingId ? "Deleting..." : "Delete service"}
+              </Button>
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 }

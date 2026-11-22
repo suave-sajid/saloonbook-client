@@ -8,6 +8,7 @@ import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import GoogleAuthButton from "./google-auth-button";
 
 export default function SignUpForm() {
   const router = useRouter();
@@ -114,6 +115,12 @@ export default function SignUpForm() {
               : "Create Account"}
         </Button>
       </form>
+      <div className="my-4 flex items-center gap-3 text-xs text-stone-500">
+        <span className="h-px flex-1 bg-stone-200 dark:bg-stone-700" />
+        <span>or create an account with</span>
+        <span className="h-px flex-1 bg-stone-200 dark:bg-stone-700" />
+      </div>
+      <GoogleAuthButton label="Sign up with Google" />
     </div>
   );
 }

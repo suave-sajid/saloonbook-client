@@ -70,6 +70,7 @@ export default function AdminAppointments() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selected, setSelected] = useState(null);
+  const [cancelTarget, setCancelTarget] = useState(null);
   const [updatingId, setUpdatingId] = useState("");
 
   const load = useCallback(async () => {
@@ -101,6 +102,15 @@ export default function AdminAppointments() {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [selected]);
 
+  useEffect(() => {
+    if (!cancelTarget || updatingId) return undefined;
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setCancelTarget(null);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [cancelTarget, updatingId]);
+
   const update = async (item, status) => {
     setUpdatingId(item._id);
     try {
@@ -111,11 +121,19 @@ export default function AdminAppointments() {
       toast.success(`Appointment ${status}.`);
       if (selected?._id === item._id) setSelected(null);
       await load();
+      return true;
     } catch (requestError) {
       toast.error(requestError.message || "Could not update this appointment.");
+      return false;
     } finally {
       setUpdatingId("");
     }
+  };
+
+  const confirmCancellation = async () => {
+    if (!cancelTarget) return;
+    const cancelled = await update(cancelTarget, "cancelled");
+    if (cancelled) setCancelTarget(null);
   };
 
   return (
@@ -233,7 +251,7 @@ export default function AdminAppointments() {
                         <button
                           className="inline-flex h-9 items-center gap-2 rounded-lg border border-red-200 px-3 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-60 dark:border-red-900 dark:text-red-300 dark:hover:bg-red-950/40"
                           disabled={updatingId === item._id}
-                          onClick={() => update(item, "cancelled")}
+                          onClick={() => setCancelTarget(item)}
                           type="button"
                         >
                           {updatingId === item._id && <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />}
@@ -337,7 +355,7 @@ export default function AdminAppointments() {
                 <button
                   className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-red-200 px-3 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-60 dark:border-red-900 dark:text-red-300 dark:hover:bg-red-950/40"
                   disabled={updatingId === selected._id}
-                  onClick={() => update(selected, "cancelled")}
+                  onClick={() => setCancelTarget(selected)}
                   type="button"
                 >
                   {updatingId === selected._id && <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />}
@@ -345,6 +363,55 @@ export default function AdminAppointments() {
                 </button>
               </div>
             )}
+          </section>
+        </div>
+      )}
+
+      {cancelTarget && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !updatingId) setCancelTarget(null);
+          }}
+          role="presentation"
+        >
+          <section
+            aria-describedby="cancel-appointment-description"
+            aria-labelledby="cancel-appointment-title"
+            aria-modal="true"
+            className="w-full max-w-md rounded-2xl border bg-card p-6 shadow-xl"
+            role="alertdialog"
+          >
+            <div className="flex items-start gap-4">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                <CircleAlert aria-hidden="true" className="size-5" />
+              </span>
+              <div className="min-w-0">
+                <h2 className="font-semibold" id="cancel-appointment-title">Cancel this appointment?</h2>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground" id="cancel-appointment-description">
+                  Cancel {cancelTarget.service?.serviceName || "this service"} for {formatDate(cancelTarget.appointmentDate)} at {cancelTarget.timeSlot || "the scheduled time"}? This action cannot be undone.
+                </p>
+              </div>
+            </div>
+            <div className="mt-6 flex flex-col-reverse justify-end gap-2 sm:flex-row">
+              <button
+                className="h-9 rounded-lg border px-3 text-sm font-medium hover:bg-accent disabled:opacity-50"
+                disabled={Boolean(updatingId)}
+                onClick={() => setCancelTarget(null)}
+                type="button"
+              >
+                Keep appointment
+              </button>
+              <button
+                className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-destructive px-3 text-sm font-semibold text-destructive-foreground hover:bg-destructive/90 disabled:opacity-60"
+                disabled={Boolean(updatingId)}
+                onClick={confirmCancellation}
+                type="button"
+              >
+                {updatingId === cancelTarget._id && <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />}
+                {updatingId === cancelTarget._id ? "Cancelling..." : "Cancel appointment"}
+              </button>
+            </div>
           </section>
         </div>
       )}
