@@ -1,4 +1,5 @@
 # SalonBook Client
+Live site: https://saloonbook-client.vercel.app
 
 SalonBook is the responsive Next.js client for a role-based salon appointment booking platform.
 
@@ -54,6 +55,6 @@ Run this once from the client directory. The script creates the account using Be
 
 ## Live and Repository Links
 
-- Live website: Add the deployed URL here
-- Server repository: Add the server GitHub repository URL here
-- Client repository: Add the client GitHub repository URL here
+- Live website: [salonbook](https://saloonbook-client.vercel.app)
+- Server repository: https://github.com/suave-sajid/salonbook-server
+- Client repository: https://github.com/suave-sajid/saloonbook-client
