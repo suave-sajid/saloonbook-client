@@ -1,18 +1,10 @@
-import Navbar from "@/components/home/navbar";
-import Footer from "@/components/home/footer";
-import ProfileForm from "@/components/profile/profile-form";
+import { redirect } from "next/navigation";
 
 export const metadata = {
-  title: "Profile management | SalonBook",
+  title: "My profile | SalonBook",
   description: "Manage your SalonBook profile information and photo.",
 };
 
 export default function ProfilePage() {
-  return (
-    <>
-      <Navbar />
-      <ProfileForm />
-      <Footer />
-    </>
-  );
+  redirect("/dashboard/profile");
 }

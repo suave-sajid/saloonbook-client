@@ -1,3 +1,6 @@
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
+
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = new Set([
   "image/jpeg",
@@ -6,6 +9,14 @@ const ALLOWED_IMAGE_TYPES = new Set([
 ]);
 
 export async function POST(request) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) {
+    return Response.json({ error: "Sign in to upload a profile photo." }, { status: 401 });
+  }
+  if (session.user.isBlocked) {
+    return Response.json({ error: "Blocked accounts cannot upload a profile photo." }, { status: 403 });
+  }
+
   const origin = request.headers.get("origin");
   if (!origin || origin !== new URL(request.url).origin) {
     return Response.json({ error: "Invalid request origin." }, { status: 403 });

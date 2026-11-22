@@ -23,11 +23,13 @@ const adminLinks = [
   { label: "Appointments", href: "/dashboard/admin/appointments", icon: CalendarDays },
   { label: "Customers", href: "/dashboard/admin/users", icon: UsersRound },
   { label: "Transactions", href: "/dashboard/admin/transactions", icon: CircleDollarSign },
+  { label: "My profile", href: "/dashboard/profile", icon: UserRound },
 ];
 
 const customerLinks = [
   { label: "Overview", href: "/dashboard/customer", icon: ChartNoAxesColumnIncreasing },
   { label: "My appointments", href: "/dashboard/customer/appointments", icon: CalendarDays },
+  { label: "My profile", href: "/dashboard/profile", icon: UserRound },
 ];
 
 function isActiveLink(pathname, href) {

@@ -80,7 +80,7 @@ export default function Navbar() {
     </Link>
     <Link
       className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-100 dark:text-stone-200 dark:hover:bg-stone-800"
-      href="/profile"
+      href="/dashboard/profile"
       onClick={() => {
         setProfileMenuOpen(false);
         setMenuOpen(false);
